@@ -53,6 +53,20 @@ public class DBManager {
 	}
 	
 	/**
+	 * 创建数据库连接的方法
+	 * @return
+	 */
+	public static Connection createConn() {
+		try {
+			Class.forName(conf.getDriver());	
+			return DriverManager.getConnection(conf.getUrl(),conf.getUser(),conf.getPwd());	//后期增加连接池提高效率
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/**
 	 * 获取Configuration配置信息对象
 	 * @return	Configuration对象
 	 */
