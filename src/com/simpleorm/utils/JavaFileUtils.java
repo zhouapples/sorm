@@ -1,5 +1,9 @@
 package com.simpleorm.utils;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -89,12 +93,49 @@ public class JavaFileUtils {
 		src.append("\n\n");
 		//生成类结束
 		src.append("}\n");
-		System.out.println(src);
+		//System.out.println(src);
 		
 		return src.toString();
 	}
 	
-	
+	/**
+	 * 将动态生成的代码输出文件到po包
+	 * @param tableInfo
+	 * @param convertor
+	 */
+	public static void createJavaPOFile(TableInfo tableInfo,TypeConvertor convertor) {
+		String src = createJavaSrc(tableInfo, convertor);
+		
+		String srcPath = DBManager.getConf().getSrcPath()+"\\";
+		String packagePath = DBManager.getConf().getPoPackage().replaceAll("\\.", "\\\\");
+		//拼接完整的路径名
+		File f = new File(srcPath+packagePath+"/");
+
+		if(!f.exists()) {	//如果指定目录不存在,则创建
+			f.mkdirs();
+		}
+		
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new FileWriter(f.getAbsoluteFile()+"/"+StringUtils.firstChar2Upper(tableInfo.getTname())+".java"));
+			bw.write(src);
+			System.out.println("建立"+tableInfo.getTname()+"表对应的java类 :"+StringUtils.firstChar2Upper(tableInfo.getTname())+".java");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if(bw!=null) {
+					bw.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		
+		
+		
+	}
 	
 	public static void main(String[] args) {
 		
@@ -103,8 +144,10 @@ public class JavaFileUtils {
 		//System.out.println(f);
 		
 		Map<String,TableInfo> map = TableContext.tables;
-		TableInfo t = map.get("emp");
+		for (TableInfo t : map.values()) {
+			createJavaPOFile(t, new MySqlTypeConvertor());
+		}
 		
-		createJavaSrc(t, new MySqlTypeConvertor());
+		
 	}
 }
