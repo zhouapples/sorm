@@ -10,6 +10,8 @@ import java.util.Map;
 
 import com.simpleorm.bean.ColumnInfo;
 import com.simpleorm.bean.TableInfo;
+import com.simpleorm.utils.JavaFileUtils;
+import com.simpleorm.utils.StringUtils;
 
 /**
  * 负责管理数据库
@@ -66,12 +68,56 @@ public class TableContext {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
+		
+		//更新java类结构(类初始化时就执行)
+		updateJavaPOFile();
 	}
+	
+	/**
+	 * 根据表结构生成相应的java类到po包下
+	 */
+	public static void updateJavaPOFile() {
+		Map<String,TableInfo> map = TableContext.tables;
+		for (TableInfo t : map.values()) {
+			JavaFileUtils.createJavaPOFile(t, new MySqlTypeConvertor());
+		}
+	}
+	
+	/**
+	 * 加载po包下的类
+	 */
+	public static void loadPOTable() {	//
+		
+		for (TableInfo tableInfo : tables.values()) {
+			Class c;
+			try {
+				c = Class.forName(DBManager.getConf().getPoPackage()+"."
+							+StringUtils.firstChar2Upper(tableInfo.getTname()));
+				poClassMap.put(c, tableInfo);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	public static void main(String[] args) {
 		Map<String,TableInfo> tables = TableContext.tables;
 		System.out.println(tables);
 	}
+	
+	
+	
 }

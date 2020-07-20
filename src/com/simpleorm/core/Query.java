@@ -28,7 +28,7 @@ public interface Query {
 	 * @param id	要删除的主键id
 	 * @return	
 	 */
-	public void delete(Class cla,int id);
+	public void delete(Class cla,Object id);
 	
 	/**
 	 * 删除对象obj对应在数据库中的记录
