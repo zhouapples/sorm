@@ -42,7 +42,11 @@ public class MySqlQuery extends Query{
 		System.out.println(obj);
 	}
 
-	
+	@Override
+	public Object queryPagenate(int pageNum, int size) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 }

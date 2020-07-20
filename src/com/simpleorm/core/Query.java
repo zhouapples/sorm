@@ -20,6 +20,28 @@ import com.simpleorm.utils.ReflectUtils;
  *
  */
 public abstract class Query {
+	
+	public Object executeQueryTemplate(String sql,Object[] params,Class cla,CallBack back) {
+		Connection conn = DBManager.getConn();
+		List list = null;	//用于存放查询结果的容器
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			ps = conn.prepareStatement(sql);
+			JDBCUtils.handleParams(ps, params);	//给sql设置参数
+			System.out.println(ps);
+			rs = ps.executeQuery();
+			
+			return back.doExecute(conn, ps, rs);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}finally {
+			DBManager.close(ps, conn);
+		}
+	}
+	
 	/**
 	 * 直接执行一个DML语句
 	 * @param sql	sql语句
@@ -147,39 +169,36 @@ public abstract class Query {
 	 * @return	返回一个含所有cla的列表
 	 */
 	public List queryRows(String sql,Class cla,Object[] params) {
-		Connection conn = DBManager.getConn();
-		List list = null;	//用于存放查询结果的容器
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			ps = conn.prepareStatement(sql);
-			JDBCUtils.handleParams(ps, params);	//给sql设置参数
-			System.out.println(ps);
-			rs = ps.executeQuery();
-			ResultSetMetaData metaData = rs.getMetaData();
-			//多行
-			while(rs.next()) {
-				if(list==null) {
-					list = new ArrayList();
-				}
-				Object rowObj = cla.newInstance();	//调用Javabean的无参构造器
-				//多列 ,参考 select username,age,gender from 表名 where id>? and age>?
-				for (int i=0;i<metaData.getColumnCount();i++) {
-					String  columnName = metaData.getColumnLabel(i+1);
-					Object columnValue = rs.getObject(i+1);
-					
-					//通过反射调用rowObj的对应set方法,将columnValue的值设置进去
-					ReflectUtils.invokeSet(rowObj, columnName, columnValue);//就是设置rowObj对象的columnName属性为columnValue
-				}
-				list.add(rowObj);
-			}
+		
+		return (List)executeQueryTemplate(sql, params, cla, new CallBack() {
 			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}finally {
-			DBManager.close(ps, conn);
-		}
-		return list;
+			@Override
+			public Object doExecute(Connection conn, PreparedStatement ps, ResultSet rs) {
+				List list = null;	//用于存放查询结果的容器
+				try {
+					if(list==null) {
+						list = new ArrayList();
+					}
+					ResultSetMetaData metaData = rs.getMetaData();
+					//多行
+					while(rs.next()) {
+						Object rowObj = cla.newInstance();	//调用Javabean的无参构造器
+						//多列 ,参考 select username,age,gender from 表名 where id>? and age>?
+						for (int i=0;i<metaData.getColumnCount();i++) {
+							String  columnName = metaData.getColumnLabel(i+1);
+							Object columnValue = rs.getObject(i+1);
+							
+							//通过反射调用rowObj的对应set方法,将columnValue的值设置进去
+							ReflectUtils.invokeSet(rowObj, columnName, columnValue);//就是设置rowObj对象的columnName属性为columnValue
+						}
+						list.add(rowObj);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return list;
+			}
+		});
 	}
 	
 	/**
@@ -233,5 +252,12 @@ public abstract class Query {
 		return (Number)queryValue(sql,params);
 	}
 	
+	/**
+	 * 分页查询
+	 * @param pageNum	当前第几页
+	 * @param size	每页显示数据量
+	 * @return
+	 */
+	public abstract Object queryPagenate(int pageNum,int size);
 	
 }
