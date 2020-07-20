@@ -32,11 +32,16 @@ public class MySqlQuery implements Query{
 		//new MySqlQuery().delete(e);
 		//new MySqlQuery().insert(e);
 		//new MySqlQuery().update(e,new String[] {"empname","age","birthday"});
-		List<Emp> list = new MySqlQuery().queryRows("select empname,age from emp where id>? and age<?",
+		/*List<Emp> list = new MySqlQuery().queryRows("select empname,age from emp where id>? and age<?",
 				Emp.class, new Object[] {1,100});
 		for (Emp emp : list) {
 			System.out.println(emp.getEmpname());
-		}
+		}*/
+		
+		Object obj = new MySqlQuery().queryValue("select count(1) from emp where id<?", new Object[] {5});
+		System.out.println(obj);
+		
+		
 	}
 	
 	
@@ -177,20 +182,36 @@ public class MySqlQuery implements Query{
 
 	@Override
 	public Object queryUniqueRow(String sql, Class cla, Object[] params) {
-		// TODO Auto-generated method stub
-		return null;
+		List list = queryRows(sql,cla,params);
+		return (list==null&&list.size()>0)?null:list.get(0);	//如果list不为空,只拿第一条
 	}
 
 	@Override
 	public Object queryValue(String sql, Object[] params) {
-		// TODO Auto-generated method stub
-		return null;
+		Connection conn = DBManager.getConn();
+		Object value = null;	//用于存放查询结果的容器
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			ps = conn.prepareStatement(sql);
+			JDBCUtils.handleParams(ps, params);	//给sql设置参数
+			System.out.println(ps);
+			rs = ps.executeQuery();
+			//多行
+			while(rs.next()) {
+				value = rs.getObject(1);
+			}	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(ps, conn);
+		}
+		return value;
 	}
 
 	@Override
 	public Number queryNumber(String sql, Object[] params) {
-		// TODO Auto-generated method stub
-		return null;
+		return (Number)queryValue(sql,params);
 	}
 	
 }
