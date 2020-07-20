@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +31,12 @@ public class MySqlQuery implements Query{
 		
 		//new MySqlQuery().delete(e);
 		//new MySqlQuery().insert(e);
-		new MySqlQuery().update(e,new String[] {"empname","age","birthday"});
-		
-		
+		//new MySqlQuery().update(e,new String[] {"empname","age","birthday"});
+		List<Emp> list = new MySqlQuery().queryRows("select empname,age from emp where id>? and age<?",
+				Emp.class, new Object[] {1,100});
+		for (Emp emp : list) {
+			System.out.println(emp.getEmpname());
+		}
 	}
 	
 	
@@ -135,8 +140,39 @@ public class MySqlQuery implements Query{
 
 	@Override
 	public List queryRows(String sql, Class cla, Object[] params) {
-		// TODO Auto-generated method stub
-		return null;
+		Connection conn = DBManager.getConn();
+		List list = null;	//用于存放查询结果的容器
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			ps = conn.prepareStatement(sql);
+			JDBCUtils.handleParams(ps, params);	//给sql设置参数
+			System.out.println(ps);
+			rs = ps.executeQuery();
+			ResultSetMetaData metaData = rs.getMetaData();
+			//多行
+			while(rs.next()) {
+				if(list==null) {
+					list = new ArrayList();
+				}
+				Object rowObj = cla.newInstance();	//调用Javabean的无参构造器
+				//多列 ,参考 select username,age,gender from 表名 where id>? and age>?
+				for (int i=0;i<metaData.getColumnCount();i++) {
+					String  columnName = metaData.getColumnLabel(i+1);
+					Object columnValue = rs.getObject(i+1);
+					
+					//通过反射调用rowObj的对应set方法,将columnValue的值设置进去
+					ReflectUtils.invokeSet(rowObj, columnName, columnValue);//就是设置rowObj对象的columnName属性为columnValue
+				}
+				list.add(rowObj);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(ps, conn);
+		}
+		return list;
 	}
 
 	@Override
