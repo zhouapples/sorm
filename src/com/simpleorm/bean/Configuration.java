@@ -36,6 +36,16 @@ public class Configuration {
 	private String srcPath;	//项目路径
 	
 	/**
+	 * 连接池中最小连接数
+	 */
+	private int poolMinSize;
+	
+	/**
+	 * 连接池中最大连接数
+	 */
+	private int poolMaxSize;
+	
+	/**
 	 * persist to package,扫描生成java类的包
 	 */
 	private String poPackage;	//persist2package路径,即持久化路径
@@ -95,6 +105,22 @@ public class Configuration {
 	public void setPoPackage(String poPackage) {
 		this.poPackage = poPackage;
 	}
+	
+	public int getPoolMinSize() {
+		return poolMinSize;
+	}
+
+	public void setPoolMinSize(int poolMinSize) {
+		this.poolMinSize = poolMinSize;
+	}
+
+	public int getPoolMaxSize() {
+		return poolMaxSize;
+	}
+
+	public void setPoolMaxSize(int poolMaxSize) {
+		this.poolMaxSize = poolMaxSize;
+	}
 
 	public Configuration(String driver, String url, String user, String pwd, String usingDB, String srcPath,
 			String poPackage) {
@@ -111,6 +137,7 @@ public class Configuration {
 	public Configuration() {
 		super();
 	}
+
 	
 	
 }

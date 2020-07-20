@@ -36,6 +36,8 @@ public class DBManager {
 		conf.setUrl(pros.getProperty("url"));
 		conf.setUser(pros.getProperty("user"));
 		conf.setUsingDB(pros.getProperty("usingDB"));
+		conf.setPoolMaxSize(Integer.parseInt(pros.getProperty("poolMaxSize")));
+		conf.setPoolMinSize(Integer.parseInt(pros.getProperty("poolMinSize")));
 	}
 	
 	/**

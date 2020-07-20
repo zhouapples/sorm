@@ -16,17 +16,17 @@ public class DBConnPool {
 	/**
 	 * 连接池对象
 	 */
-	public static List pool;	//连接池
+	private List<Connection> pool;	//连接池
 	
 	/**
 	 * 连接池储存最大连接数
 	 */
-	private static final int POOL_MAX_SIZE = 100;
+	private static final int POOL_MAX_SIZE = DBManager.getConf().getPoolMaxSize();
 	
 	/**
 	 * 初始化连接池,使池中连接数达到最小值
 	 */
-	private static final int POOL_MIN_SIZE = 10;
+	private static final int POOL_MIN_SIZE = DBManager.getConf().getPoolMinSize();
 	
 	public void initPool() {
 		if(pool==null) {
@@ -48,7 +48,7 @@ public class DBConnPool {
 	 */
 	public synchronized Connection getConnection() {
 		int last_index = pool.size()-1;	//获取最后一个
-		Connection conn = (Connection) pool.get(last_index);
+		Connection conn = pool.get(last_index);
 		pool.remove(last_index);	//移除已取出的,避免下回别人取的时候还是取到它
 		return conn;
 	}
