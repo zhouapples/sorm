@@ -3,6 +3,9 @@ package com.simpleorm.core;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 import com.simpleorm.bean.Configuration;
@@ -36,7 +39,7 @@ public class DBManager {
 	}
 	
 	/**
-	 * 获取数据库连接
+	 * 获取数据库连接的方法
 	 * @return
 	 */
 	public static Connection getConn() {
@@ -50,10 +53,64 @@ public class DBManager {
 	}
 	
 	/**
-	 * 获取Configuration对象,配置信息对象
+	 * 获取Configuration配置信息对象
 	 * @return	Configuration对象
 	 */
 	public static Configuration getConf() {
 		return conf;
 	}
+	
+	/**
+	 * 关闭传入的ResultSet,Statement,Connection对象
+	 * @param rs	
+	 * @param ps
+	 * @param conn
+	 */
+	public static void close(ResultSet rs,Statement ps,Connection conn) {
+		try {
+			if(rs!=null) {
+				rs.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			if(ps!=null) {
+				ps.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			if(conn!=null) {
+				conn.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 关闭传入的Statement,Connection对象
+	 * @param ps
+	 * @param conn
+	 */
+	public static void close(Statement ps,Connection conn) {
+		
+		try {
+			if(ps!=null) {
+				ps.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			if(conn!=null) {
+				conn.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 }
