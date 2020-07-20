@@ -18,6 +18,7 @@ public interface Query {
 	
 	/**
 	 * 将一个对象的信息储存到数据库中
+	 * 把对象中不为null的属性储存到数据库中,数字缺失的默认为0
 	 * @param obj	要储存的对象
 	 */
 	public void insert(Object obj);

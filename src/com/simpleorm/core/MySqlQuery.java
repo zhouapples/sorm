@@ -1,9 +1,11 @@
 package com.simpleorm.core;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.simpleorm.bean.ColumnInfo;
@@ -21,7 +23,11 @@ public class MySqlQuery implements Query{
 	public static void main(String[] args) {
 		Emp e = new Emp();
 		e.setId(1);
-		new MySqlQuery().delete(e);
+		e.setEmpname("小欧");
+		e.setAge(20);
+		
+		new MySqlQuery().insert(e);
+		
 		
 	}
 	
@@ -48,8 +54,32 @@ public class MySqlQuery implements Query{
 
 	@Override
 	public void insert(Object obj) {
-		// TODO Auto-generated method stub
 		
+		//insert into 表名(id,name,age,address) values(?,?,?,?);
+		List<Object> params = new ArrayList<Object>();
+		Class c = obj.getClass();
+		TableInfo tableInfo = TableContext.poClassMap.get(c);	//获取poClassMap里的TableInfo对象
+		Field[] fs = c.getDeclaredFields();
+		StringBuilder sql = new StringBuilder("insert into "+tableInfo.getTname()+" (");
+		int countNotNullField = 0; //记录属性不为null的个数(用于确定insert的values)
+		for (Field f : fs) {
+			String fieldName = f.getName();
+			Object fieldValue = ReflectUtils.invokeGet(fieldName, obj);
+			
+			if(fieldValue!=null) {
+				countNotNullField++;
+				sql.append(fieldName+",");
+				params.add(fieldValue);	//储存参数,为values做准备
+			}
+		}
+		sql.setCharAt(sql.length()-1, ')');
+		sql.append(" values (");
+		for (int i = 0; i < countNotNullField; i++) {
+			sql.append("?,");	//有几个参数就放几个问号作为占位符
+		}
+		sql.setCharAt(sql.length()-1, ')');
+		System.out.println(sql.toString()+"*******************");
+		executeDML(sql.toString(),params.toArray());	//List转object数组可以直接转
 	}
 
 	@Override
@@ -61,7 +91,7 @@ public class MySqlQuery implements Query{
 		//获得主键
 		ColumnInfo onlyPriKey = tableInfo.getOnlyPriKey();
 		String sql = "delete from " +tableInfo.getTname() +" where " +onlyPriKey.getName()+"=?";
-		System.out.println(sql+"****************");
+		//System.out.println(sql+"****************");
 		executeDML(sql,new Object[] {id}); 
 	}
  
