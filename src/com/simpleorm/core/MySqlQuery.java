@@ -23,10 +23,13 @@ public class MySqlQuery implements Query{
 	public static void main(String[] args) {
 		Emp e = new Emp();
 		e.setId(1);
-		e.setEmpname("小欧");
+		e.setEmpname("xiaoou");
 		e.setAge(20);
+		e.setBirthday(new java.sql.Date(System.currentTimeMillis()));
 		
-		new MySqlQuery().insert(e);
+		//new MySqlQuery().delete(e);
+		//new MySqlQuery().insert(e);
+		new MySqlQuery().update(e,new String[] {"empname","age","birthday"});
 		
 		
 	}
@@ -40,8 +43,8 @@ public class MySqlQuery implements Query{
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement(sql);
-			//给sql设置参数
-			JDBCUtils.handleParams(ps, params);
+			System.out.println(sql.toString()+"*******");
+			JDBCUtils.handleParams(ps, params);	//给sql设置参数
 			count = ps.executeUpdate();
 			
 		} catch (SQLException e) {
@@ -108,9 +111,26 @@ public class MySqlQuery implements Query{
 	}
 
 	@Override
-	public int update(Object obj, String[] fileNames) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int update(Object obj, String[] fieldNames) {
+		//参考 update 表名 set username=?,password=? where id=?;
+		List<Object> params = new ArrayList<Object>();
+		Class c = obj.getClass();
+		TableInfo tableInfo = TableContext.poClassMap.get(c);	//获取poClassMap里的TableInfo对象
+		ColumnInfo priKey = tableInfo.getOnlyPriKey();	//获得主键,根据主键修改
+		Field[] fs = c.getDeclaredFields();
+		StringBuilder sql = new StringBuilder("update "+tableInfo.getTname()+" set ");
+		
+		for (String fname : fieldNames) {
+			Object fvalue = ReflectUtils.invokeGet(fname, obj);
+			params.add(fvalue);	//存入参数集
+			sql.append(fname+"=?,");
+			
+		}
+		sql.setCharAt(sql.length()-1, ' ');
+		sql.append(" where "+priKey.getName()+" =? ");
+		params.add(ReflectUtils.invokeGet(priKey.getName(), obj));	//主键的值
+		
+		return executeDML(sql.toString(), params.toArray());
 	}
 
 	@Override

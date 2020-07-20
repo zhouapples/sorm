@@ -43,7 +43,7 @@ public interface Query {
 	 * @param fileNames	要更新的属性表
 	 * @return	受影响行数
 	 */
-	public int update(Object obj,String[] fileNames);
+	public int update(Object obj,String[] fieldNames);
 	
 	/**
 	 * 查询返回多行记录,每行记录存放到cla对象中
