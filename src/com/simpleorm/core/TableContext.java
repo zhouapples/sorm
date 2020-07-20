@@ -71,6 +71,8 @@ public class TableContext {
 		
 		//更新java类结构(类初始化时就执行)
 		updateJavaPOFile();
+		//加载po包下的表类
+		loadPOTable();
 	}
 	
 	/**
