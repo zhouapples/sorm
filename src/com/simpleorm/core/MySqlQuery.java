@@ -32,20 +32,17 @@ public class MySqlQuery extends Query{
 		//new MySqlQuery().delete(e);
 		//new MySqlQuery().insert(e);
 		//new MySqlQuery().update(e,new String[] {"empname","age","birthday"});
-		List<Emp> list = new MySqlQuery().queryRows("select empname,age from emp where id>? and age<?",
+		/*List<Emp> list = new MySqlQuery().queryRows("select empname,age from emp where id>? and age<?",
 				Emp.class, new Object[] {1,100});
 		for (Emp emp : list) {
 			System.out.println(emp.getEmpname());
-		}
+		}*/
 		
-		//Object obj = new MySqlQuery().queryValue("select count(1) from emp where id<?", new Object[] {5});
-		//System.out.println(obj);
+		Object obj = new MySqlQuery().queryValue("select count(1) from emp where id<?", new Object[] {5});
+		System.out.println(obj);
 	}
 
-	
-	
-	
-	
+
 	@Override
 	public Object queryPagenate(int pageNum, int size) {
 		// TODO Auto-generated method stub

@@ -21,6 +21,14 @@ import com.simpleorm.utils.ReflectUtils;
  */
 public abstract class Query {
 	
+	/**
+	 * 将jdbc操作封装成模板,方便复用
+	 * @param sql	sql语句
+	 * @param params	sql参数集
+	 * @param cla	要封装到的java类
+	 * @param back	回调方法,callback实现类,实现回调
+	 * @return
+	 */
 	public Object executeQueryTemplate(String sql,Object[] params,Class cla,CallBack back) {
 		Connection conn = DBManager.getConn();
 		List list = null;	//用于存放查询结果的容器
@@ -221,25 +229,22 @@ public abstract class Query {
 	 * @return	返回的值的对象
 	 */
 	public Object queryValue(String sql,Object[] params) {
-		Connection conn = DBManager.getConn();
-		Object value = null;	//用于存放查询结果的容器
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			ps = conn.prepareStatement(sql);
-			JDBCUtils.handleParams(ps, params);	//给sql设置参数
-			System.out.println(ps);
-			rs = ps.executeQuery();
-			//多行
-			while(rs.next()) {
-				value = rs.getObject(1);
-			}	
-		} catch (Exception e) {
-			e.printStackTrace();
-		}finally {
-			DBManager.close(ps, conn);
-		}
-		return value;
+
+		return executeQueryTemplate(sql, params, null, new CallBack() {
+			@Override
+			public Object doExecute(Connection conn, PreparedStatement ps, ResultSet rs) {
+				Object value = null;
+				try {
+					//多行
+					while(rs.next()) {
+						value = rs.getObject(1);
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}	
+				return value;
+			}
+		});
 	}
 	
 	/**
