@@ -98,9 +98,9 @@ public class JavaFileUtils {
 	
 	public static void main(String[] args) {
 		
-//		ColumnInfo ci = new ColumnInfo("id","int","0");
-//		JavaFieldGetSet f = createFieldGetSetSRC(ci, new MySqlTypeConvertor());
-//		System.out.println(f);
+		//ColumnInfo ci = new ColumnInfo("id","int","0");
+		//JavaFieldGetSet f = createFieldGetSetSRC(ci, new MySqlTypeConvertor());
+		//System.out.println(f);
 		
 		Map<String,TableInfo> map = TableContext.tables;
 		TableInfo t = map.get("emp");
