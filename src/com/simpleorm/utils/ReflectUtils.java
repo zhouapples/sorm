@@ -31,10 +31,12 @@ public class ReflectUtils {
 	public static void invokeSet(Object obj,String columnName,Object columnValue) {
 		//通过反射调用rowObj的对应set方法,将columnValue的值设置进去
 		try {
-			Method m = obj.getClass().getDeclaredMethod("set"+StringUtils.firstChar2Upper(columnName),
-					columnValue.getClass() );
-			
-			m.invoke(obj, columnValue);	//获取到方法就要去调用,设置参数
+			if(columnValue!=null) {
+				Method m = obj.getClass().getDeclaredMethod("set"+StringUtils.firstChar2Upper(columnName),
+						columnValue.getClass() );
+				
+				m.invoke(obj, columnValue);	//获取到方法就要去调用,设置参数				
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
