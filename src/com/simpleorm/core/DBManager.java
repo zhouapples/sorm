@@ -56,7 +56,7 @@ public class DBManager {
 	 * @return
 	 */
 	public static Connection getConn() {
-		if(pool==null) {
+		if(pool==null) {	//第一次取连接的时候进行连接池初始化
 			pool = new DBConnPool();
 		}
 		return pool.getConnection();
