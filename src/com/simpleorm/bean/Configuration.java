@@ -49,6 +49,20 @@ public class Configuration {
 	 * persist to package,扫描生成java类的包
 	 */
 	private String poPackage;	//persist2package路径,即持久化路径
+	
+	/**
+	 * 项目使用查询类的路径(使用哪个查询类来执行查询)
+	 */
+	private String queryClass;
+	
+
+	public String getQueryClass() {
+		return queryClass;
+	}
+
+	public void setQueryClass(String queryClass) {
+		this.queryClass = queryClass;
+	}
 
 	public String getDriver() {
 		return driver;

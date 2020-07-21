@@ -19,7 +19,7 @@ import com.simpleorm.utils.ReflectUtils;
  * @author MiKimouse
  *
  */
-public abstract class Query {
+public abstract class Query implements Cloneable{
 	
 	/**
 	 * 将jdbc操作封装成模板,方便复用
@@ -265,4 +265,9 @@ public abstract class Query {
 	 */
 	public abstract Object queryPagenate(int pageNum,int size);
 	
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		return super.clone();
+	}
 }

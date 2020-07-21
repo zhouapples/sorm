@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.Properties;
 
 import com.simpleorm.bean.Configuration;
+import com.simpleorm.pool.DBConnPool;
 
 /**
  * 根据配置信息,维持连接对象的管理 
@@ -16,7 +17,14 @@ import com.simpleorm.bean.Configuration;
  *
  */
 public class DBManager {
+	/**
+	 * 配置信息对象
+	 */
 	private static Configuration conf;
+	/**
+	 * 连接池对象
+	 */
+	private static DBConnPool pool;
 	
 	/**
 	 * 获得配置文件
@@ -38,6 +46,9 @@ public class DBManager {
 		conf.setUsingDB(pros.getProperty("usingDB"));
 		conf.setPoolMaxSize(Integer.parseInt(pros.getProperty("poolMaxSize")));
 		conf.setPoolMinSize(Integer.parseInt(pros.getProperty("poolMinSize")));
+		conf.setQueryClass(pros.getProperty("queryClass"));
+		//加载类结构信息
+		System.out.println(TableContext.class);
 	}
 	
 	/**
@@ -45,13 +56,10 @@ public class DBManager {
 	 * @return
 	 */
 	public static Connection getConn() {
-		try {
-			Class.forName(conf.getDriver());	
-			return DriverManager.getConnection(conf.getUrl(),conf.getUser(),conf.getPwd());	//后期增加连接池提高效率
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+		if(pool==null) {
+			pool = new DBConnPool();
 		}
+		return pool.getConnection();
 	}
 	
 	/**
@@ -113,20 +121,24 @@ public class DBManager {
 	 */
 	public static void close(Statement ps,Connection conn) {
 		
-		try {
-			if(ps!=null) {
-				ps.close();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		try {
-			if(conn!=null) {
-				conn.close();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			if(ps!=null) {
+//				ps.close();
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		try {
+//			if(conn!=null) {
+//				conn.close();
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+		
+		pool.close(conn);
+		
+		
 	}
 	
 }
