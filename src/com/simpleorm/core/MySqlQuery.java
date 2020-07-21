@@ -12,7 +12,7 @@ import java.util.List;
 
 import com.simpleorm.bean.ColumnInfo;
 import com.simpleorm.bean.TableInfo;
-import com.simpleorm.po.Emp;
+//import com.simpleorm.po.Emp;
 import com.simpleorm.utils.JDBCUtils;
 import com.simpleorm.utils.ReflectUtils;
 import com.simpleorm.utils.StringUtils;
@@ -23,6 +23,7 @@ import com.simpleorm.utils.StringUtils;
  */
 public class MySqlQuery extends Query{
 	public static void main(String[] args) {
+		/*
 		Emp e = new Emp();
 		e.setId(1);
 		e.setEmpname("xiaoou");
@@ -36,7 +37,9 @@ public class MySqlQuery extends Query{
 				Emp.class, new Object[] {1,100});
 		for (Emp emp : list) {
 			System.out.println(emp.getEmpname());
-		}*/
+		}
+		
+		*/
 		
 		Object obj = new MySqlQuery().queryValue("select count(1) from emp where id<?", new Object[] {5});
 		System.out.println(obj);

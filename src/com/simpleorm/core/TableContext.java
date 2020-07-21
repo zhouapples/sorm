@@ -70,7 +70,7 @@ public class TableContext {
 		}
 		
 		//更新java类结构(类初始化时就执行)
-		updateJavaPOFile();
+		//updateJavaPOFile();
 		//加载po包下的表类
 		loadPOTable();
 	}
@@ -89,7 +89,7 @@ public class TableContext {
 	 * 加载po包下的类
 	 */
 	public static void loadPOTable() {	//
-		
+		int i = 1;
 		for (TableInfo tableInfo : tables.values()) {
 			Class c;
 			try {
@@ -97,7 +97,8 @@ public class TableContext {
 							+StringUtils.firstChar2Upper(tableInfo.getTname()));
 				poClassMap.put(c, tableInfo);
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				System.out.println("初始化第"+i+"个表文件");
+				i++;
 			}
 		}
 	}

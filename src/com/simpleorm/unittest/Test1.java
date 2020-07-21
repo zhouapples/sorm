@@ -5,7 +5,7 @@ import java.util.List;
 import com.simpleorm.core.MySqlQuery;
 import com.simpleorm.core.Query;
 import com.simpleorm.core.QueryFactory;
-import com.simpleorm.po.Emp;
+//import com.simpleorm.po.Emp;
 
 /**
  * 测试连接池效率
